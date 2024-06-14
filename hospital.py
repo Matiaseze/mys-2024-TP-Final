@@ -53,8 +53,8 @@ La funcion heapq.heappush(heap, item) trata a los arreglos como colas
 de prioridad entonces siempre que se agrega un elemento a la cola de 
 eventos y lo ordena segun el tiempo (el primer elemento de la tupla).
 '''
-def agregar_evento(estado, tiempo, tipo, datos):
-    heapq.heappush(estado['eventos'], (tiempo, tipo, datos)) # Cola de eventos
+def agregar_evento(estado, tiempo, tipo):
+    heapq.heappush(estado['eventos'], (tiempo, tipo)) # Cola de eventos
 
 def llegada_paciente(estado):
     if estado['camas_ocupadas'] < CAMAS_TOTALES:
@@ -89,7 +89,6 @@ Consultar:
 en el caso que se rechace un paciente y tambien el caso de tener que dejarlo en cola de espera de quirofano
 
 '''
-
 
 def simulacion():
     
