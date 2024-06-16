@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>UNPSJB:: MyS - 2024 - TP Final - Simulaci&oacute;n de Hospital</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#712cf9">
+        <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/cheatsheet/">
+        <link rel="apple-touch-icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+        <link rel="icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+        <link rel="icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+        <link rel="manifest" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/manifest.json">
+        <link rel="mask-icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
+        <link rel="icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/favicon.ico">
+
+        <script src="https://getbootstrap.com/docs/5.3/assets/js/color-modes.js"></script>
+        <script src="https://getbootstrap.com/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script src="https://getbootstrap.com/docs/5.3/examples/cheatsheet/cheatsheet.js"></script>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+        <link href="https://getbootstrap.com/docs/5.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link href="https://getbootstrap.com/docs/5.3/examples/cheatsheet/cheatsheet.css" rel="stylesheet">
+        <style>
+
+            .bd-placeholder-img {
+                font-size: 1.125rem;
+                text-anchor: middle;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                user-select: none;
+            }
+
+            @media (min-width: 768px) {
+                .bd-placeholder-img-lg {
+                  font-size: 3.5rem;
+                }
+            }
+
+            .b-example-divider {
+                width: 100%;
+                height: 3rem;
+                background-color: rgba(0, 0, 0, .1);
+                border: solid rgba(0, 0, 0, .15);
+                border-width: 1px 0;
+                box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+            }
+
+            .b-example-vr {
+                flex-shrink: 0;
+                width: 1.5rem;
+                height: 100vh;
+            }
+
+            .bi {
+                vertical-align: -.125em;
+                fill: currentColor;
+            }
+
+            .nav-scroller {
+                position: relative;
+                z-index: 2;
+                height: 2.75rem;
+                overflow-y: hidden;
+            }
+
+            .nav-scroller .nav {
+                display: flex;
+                flex-wrap: nowrap;
+                padding-bottom: 1rem;
+                margin-top: -1px;
+                overflow-x: auto;
+                text-align: center;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .btn-bd-primary {
+                --bd-violet-bg: #712cf9;
+                --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+                --bs-btn-font-weight: 600;
+                --bs-btn-color: var(--bs-white);
+                --bs-btn-bg: var(--bd-violet-bg);
+                --bs-btn-border-color: var(--bd-violet-bg);
+                --bs-btn-hover-color: var(--bs-white);
+                --bs-btn-hover-bg: #6528e0;
+                --bs-btn-hover-border-color: #6528e0;
+                --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+                --bs-btn-active-color: var(--bs-btn-hover-color);
+                --bs-btn-active-bg: #5a23c8;
+                --bs-btn-active-border-color: #5a23c8;
+            }
+
+            .bd-mode-toggle {
+                z-index: 1500;
+            }
+
+            .bd-mode-toggle .dropdown-menu .active .bi {
+                display: block !important;
+            }
+        </style>
+    </head>
+    <body class="bg-body-tertiary">
+        <header class="bd-header bg-dark py-3 d-flex align-items-stretch border-bottom border-dark">
+            <div class="container-fluid d-flex align-items-center">
+                <h1 class="d-flex align-items-center fs-4 text-white mb-0">
+                    <img src="./img/unpsjb.png" class="me-3" alt="Bootstrap">
+                    :: UNPSJB :: Modelos y Simulaci&oacute;n 2024
+                </h1>
+            </div>
+        </header>
+        <aside class="bd-aside sticky-xl-top text-body-secondary align-self-start mb-3 mb-xl-5 px-2">
+            <h2 class="h6 pt-4 pb-3 mb-4 border-bottom"><br><br>De la materia</h2>
+            <nav class="small" id="toc">
+                <ul class="list-unstyled">
+                    <li class="my-2">
+                        <button type="button" class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#docentes" aria-controls="docentes">Docentes</button>
+                        <ul class="list-unstyled ps-3 collapse" id="docentes">
+                            <li><b>Profesora:</b> Mg. Claudia V. L&oacute;pez de Muna&iacute;n</li>
+                            <li><b>Auxiliar:</b> Lic. Bruno Pazos</li>
+                        </ul>
+                    </li>
+                    <li class="my-2">
+                        <button type="button" class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#estudiantes" aria-controls="estudiantes">Estudiantes</button>
+                        <ul class="list-unstyled ps-3 collapse" id="estudiantes">
+                            <li>Alen Morillo Meneses</li>
+                            <li>Carlos Irigoyen</li>
+                            <li>Enzo Ana</li>
+                            <li>Mat&iacute;as Barea</li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <div class="bd-cheatsheet container-fluid bg-body">
+            <section id="parametros">
+                <h2 class="sticky-xl-top fw-bold pt-3 pt-xl-5 pb-2 pb-xl-3">TP Final - Hospital</h2>
+                <article class="my-3" id="floating-labels">
+                    <div class="bd-heading sticky-xl-top align-self-start mt-5 mb-3 mt-xl-0 mb-xl-2">
+                        <h3>Par&aacute;metros</h3>
+                    </div>
+                    <div>
+                        <div class="bd-example-snippet bd-code-snippet">
+                            <div class="bd-example m-0 border-0">
+                                <form method="post">
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control is-valid" id="aniosSimulacion" placeholder="A&ntilde;os de simulaci&oacute;n" min="1" max="10" value="2" required>
+                                        <label for="floatingInput">A&ntilde;os de simulaci&oacute;n</label>
+                                        <div class="invalid-feedback">
+                                            Indique los a&ntilde;os de simulaci&oacute;n...
+                                        </div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control is-valid" id="cantidadCamas" placeholder="Cantidad de camas" min="100" max="1000" value="210" required>
+                                        <label for="cantidadCamas">Cantidad de camas</label>
+                                        <div class="invalid-feedback">
+                                            Indique la cantidad de camas...
+                                        </div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control is-valid" id="cantidadQuirofanos" placeholder="Cantidad de quir&oacute;fanos" min="1" max="10" value="4" required>
+                                        <label for="cantidadQuirofanos">Cantidad de quir&oacute;fanos</label>
+                                        <div class="invalid-feedback">
+                                            Indique la cantidad de quir&oacute;fanos...
+                                        </div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control is-valid" id="cantidadHorasAtencionQuirofanos" placeholder="Cantidad de horas de atenci&oacute;n de los quir&oacute;fanos" min="12" max="24" value="12" required>
+                                        <label for="cantidadHorasAtencionQuirofanos">Cantidad de horas de atenci&oacute;n de los quir&oacute;fanos</label>
+                                        <div class="invalid-feedback">
+                                            Indique la cantidad de horas de atenci&oacute;n de los quir&oacute;fanos...
+                                        </div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control is-valid" id="inventarioInicial" placeholder="Inventario inicial de kits m&eacute;dicos" min="100" max="500" value="130" required>
+                                        <label for="inventarioInicial">Inventario inicial de kits m&eacute;dicos</label>
+                                        <div class="invalid-feedback">
+                                            Indique el inventario inicial de kits m&eacute;dicos...
+                                        </div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control is-valid" id="reposicionDiariaInventario" placeholder="Reposici&oacute;n diaria del inventario" min="1" max="500" value="4" required>
+                                        <label for="reposicionDiariaInventario">Reposici&oacute;n diaria del inventario</label>
+                                        <div class="invalid-feedback">
+                                            Indique la reposici&oacute;n diaria del inventario...
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <button class="btn btn-primary" type="submit">Simular</button>
+                                        <button class="btn btn-primary" type="reset">Reiniciar simulaci&oacute;n</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+            <section id="decisionesDisenio">
+                <article class="my-3" id="carousel">
+                    <div class="bd-heading sticky-xl-top align-self-start mt-5 mb-3 mt-xl-0 mb-xl-2">
+                        <h3>Decisiones de dise&ntilde;o</h3>
+                    </div>
+                    <div>
+                        <div class="bd-example-snippet bd-code-snippet">
+                            <div class="bd-example m-0 border-0">
+                                <div class="accordion" id="decisionDisenio">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="decisionDisenio1">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#colapsa1" aria-expanded="true" aria-controls="colapsa1">
+                                                Decisi&oacute;n de dise&ntilde;o #1
+                                            </button>
+                                        </h2>
+                                        <div id="colapsa1" class="accordion-collapse collapse show" aria-labelledby="decisionDisenio1" data-bs-parent="#decisionDisenio">
+                                            <div class="accordion-body">
+                                                <strong>Descripci&oacute;n:</strong> Describir acá la decisi&oacute;n de dise&ntilde;o.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="decisionDisenio2">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#colapsa2" aria-expanded="true" aria-controls="colapsa2">
+                                                Decisi&oacute;n de dise&ntilde;o #2
+                                            </button>
+                                        </h2>
+                                        <div id="colapsa2" class="accordion-collapse collapse show" aria-labelledby="decisionDisenio2" data-bs-parent="#decisionDisenio">
+                                            <div class="accordion-body">
+                                                <strong>Descripci&oacute;n:</strong> Describir acá la decisi&oacute;n de dise&ntilde;o.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="decisionDisenio3">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#colapsa3" aria-expanded="true" aria-controls="colapsa3">
+                                                Decisi&oacute;n de dise&ntilde;o #3
+                                            </button>
+                                        </h2>
+                                        <div id="colapsa3" class="accordion-collapse collapse show" aria-labelledby="decisionDisenio3" data-bs-parent="#decisionDisenio">
+                                            <div class="accordion-body">
+                                                <strong>Descripci&oacute;n:</strong> Describir acá la decisi&oacute;n de dise&ntilde;o.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </div>
+    </body>
+</html>
