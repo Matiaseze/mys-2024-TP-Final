@@ -2,8 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Tiempo simulacion
-ANIOS_SIMULACION = 2
-DIAS_SIMULACION = 365 * ANIOS_SIMULACION # 730 dias
+
 
 # Valores promedios
 PROMEDIO_KITS_MENSUALES = 130 # sigue una distribucion de poisson
@@ -14,11 +13,8 @@ PROMEDIO_TIEMPO_INTERNACION = 2  # dias, sigue una distribucion exponencial
 PROMEDIO_CIRUGIAS_DIARIAS = 8 # por quirofano
 
 # Parametros iniciales de la simulacion
-KITS_INICIALES = np.random.poisson(PROMEDIO_KITS_MENSUALES)
-CAMAS_TOTALES = 210 # parametro de entrada para comprarar con los objetivos propuestos
-CANT_QUIROFANOS = 4 # parametro de entrada para comparar con los objetivos propuestos
-CANT_HORAS_ATENCION_QUIROFANO = 12 # tiempo en horas
-KITS_REPOSICION_DIARIA = 4 # parametro de entrada para comprarar con los objetivos propuestos
+
+
 
 # Paciente. Atributos: DIA DE INTERNACION Y DIA DE ALTA
 paciente_base = {
@@ -66,7 +62,7 @@ def procesar_pacientes(estado_sistema, dia, quirofanos, cantidad_pacientes):
         cant_dias_internacion = generar_dias_internacion()
         cant_dias_internacion = 1 if cant_dias_internacion < 1 else cant_dias_internacion # Tomamos los pacientes < 0 dias internacion como = 1(un) dia de internacion
         dias_int = int(cant_dias_internacion)
-        if dia+dias_int <= DIAS_SIMULACION:
+        if dia+dias_int <= estado_sistema['dias_simulacion']:
             asignar_cama(estado_sistema, dia, dias_int)
             necesita_quirofano = np.random.uniform(0,1)
             if necesita_quirofano >= 0.43:
@@ -91,14 +87,22 @@ def inicializar_quirofanos(cantidad_quirofanos):
     ocupacion_quirofanos = {f'quirofano {i+1}': 0 for i in range(cantidad_quirofanos)}
     return quirofanos, ocupacion_quirofanos
 
-def simulacion():
+def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencion_quirofanos,inventario_inicial,reposicion_diaria_inventario):
+
+    DIAS_SIMULACION = 365 * anios_simulacion # 730 dias
+    CAMAS_TOTALES = cantidad_camas # parametro de entrada para comprarar con los objetivos propuestos
+    CANT_QUIROFANOS = cantidad_quirofanos
+    CANT_HORAS_ATENCION_QUIROFANO = horas_atencion_quirofanos # tiempo en horas
+    KITS_INICIALES = inventario_inicial
+    KITS_REPOSICION_DIARIA = reposicion_diaria_inventario # parametro de entrada para comprarar con los objetivos propuestos
 
     # Contadores globales totales
 
     estado_sistema = {
 
-        'cantidad de quirofanos:': 0,
-        'kits_iniciales': 0,
+        'dias_simulacion': DIAS_SIMULACION,
+        'cantidad de quirofanos:': CANT_QUIROFANOS,
+        'kits_iniciales': KITS_INICIALES,
         'llegadas_por_dia': [],
         'reservas_por_dia': [],
         'disponibilidad_camas': [CAMAS_TOTALES] * DIAS_SIMULACION,
@@ -112,9 +116,11 @@ def simulacion():
         'cirugias_concretadas_por_dia' : [],
         'cirugias_reprogramadas_por_insumos': [],
         'cirugias_reprogramadas_por_tiempo': [],
+        'cirugias_reprogramadas_por_cuota_diaria': [],
 
         'total_cirugias_reprogramadas_por_insumos': 0,
         'total_cirugias_reprogramadas_por_tiempo': 0,
+        'total_cirugias_reprogramadas_por_cuota_diaria': 0,
         'total_cirugias_concretadas': 0,
         'total_cirugias_rechazadas': 0,
         'total_pacientes_rechazados': 0
@@ -123,11 +129,11 @@ def simulacion():
 
     cirugias_reprogramadas_por_insumos = 0
     cirugias_reprogramadas_por_tiempo = 0
+    cirugias_reprogramadas_por_cuota_diaria = 0
     cirugias_concretadas = 0
     cirugias_rechazadas = 0
     pacientes_rechazados = 0
 
-    estado_sistema['kits_iniciales'] = KITS_INICIALES
     
     kits_disponibles = estado_sistema['kits_iniciales']
 
@@ -154,9 +160,18 @@ def simulacion():
             procesar_pacientes(estado_sistema, dia, quirofanos, camas_disponibles)
 
         '''INICIO HORARIO ATENCION'''
-       
+
         for key in quirofanos:
-            while (ocupacion_quirofanos[key] <= CANT_HORAS_ATENCION_QUIROFANO and len(quirofanos[key]) > 0 and hay_kits(kits_disponibles)):
+            
+            cantidad_cirugias = generar_cantidad_cirugias_diarias()
+            contador_cirugia = 0
+
+            while (contador_cirugia <= cantidad_cirugias 
+                   and ocupacion_quirofanos[key] <= CANT_HORAS_ATENCION_QUIROFANO 
+                   and len(quirofanos[key]) > 0 
+                   and hay_kits(kits_disponibles)):
+                
+                contador_cirugia += 1
                 paciente = quirofanos[key].pop(0)
                 if dia <= paciente['dia_alta']:
                     if hay_kits(kits_disponibles):
@@ -171,10 +186,13 @@ def simulacion():
                 else:
                     pacientes_rechazados += 1
                     cirugias_rechazadas += 1
+            
             if kits_disponibles == 0:
                 cirugias_reprogramadas_por_insumos += len(quirofanos[key])
+            elif ocupacion_quirofanos[key] > CANT_HORAS_ATENCION_QUIROFANO:
+                cirugias_reprogramadas_por_tiempo += len(quirofanos[key])
             else:
-                cirugias_reprogramadas_por_tiempo += len(quirofanos[key])      
+                cirugias_reprogramadas_por_cuota_diaria += len(quirofanos[key]) 
 
         # Contadores que son por dia.
         estado_sistema['kits_diarios_utilizados'].append(kits_disponibles)
@@ -184,10 +202,12 @@ def simulacion():
         estado_sistema['cirugias_concretadas_por_dia'].append(cirugias_concretadas)
         estado_sistema['cirugias_reprogramadas_por_insumos'].append(cirugias_reprogramadas_por_insumos)
         estado_sistema['cirugias_reprogramadas_por_tiempo'].append(cirugias_reprogramadas_por_tiempo)
+        estado_sistema['cirugias_reprogramadas_por_cuota_diaria'].append(cirugias_reprogramadas_por_cuota_diaria)
     
     # Contadores totales
     estado_sistema['total_cirugias_reprogramadas_por_insumos'] += cirugias_reprogramadas_por_insumos
     estado_sistema['total_cirugias_reprogramadas_por_tiempo'] += cirugias_reprogramadas_por_tiempo
+    estado_sistema['total_cirugias_reprogramadas_por_cuota_diaria'] += cirugias_reprogramadas_por_cuota_diaria
     estado_sistema['total_cirugias_concretadas'] += cirugias_concretadas
     estado_sistema['total_cirugias_rechazadas'] += cirugias_rechazadas
     estado_sistema['total_pacientes_rechazados'] += pacientes_rechazados
@@ -205,16 +225,17 @@ def simulacion():
           'cirugias concretadas por dia:', estado_sistema['cirugias_concretadas_por_dia'], '\n',
           'cirugias diarias reprogramadas por falta de insumos:', estado_sistema['cirugias_reprogramadas_por_insumos'], '\n',
           'cirugias diaria reprogramadas al otro dia por ocupacion del quirofano:', estado_sistema['cirugias_reprogramadas_por_tiempo'], '\n',
+          'cirugias diaria reprogramadas al otro dia por cuota diria:', estado_sistema['cirugias_reprogramadas_por_cuota_diaria'], '\n',
           'Total de cirugias reprogramadas por falta insumos:', estado_sistema['total_cirugias_reprogramadas_por_insumos'], '\n',
           'Total de cirugias reprogramadas por falta de tiempo:', estado_sistema['total_cirugias_reprogramadas_por_tiempo'], '\n',
+          'Total de cirugias reprogramadas por cuota diaria:', estado_sistema['total_cirugias_reprogramadas_por_cuota_diaria'], '\n',
           'Total cirugias concretadas:', estado_sistema['total_cirugias_concretadas'], '\n',
           'Total cirugias rechazadas:', estado_sistema['total_cirugias_rechazadas'], '\n',
           'Total pacientes rechazados:', estado_sistema['total_pacientes_rechazados']
 
           )
 
-if __name__ == '__main__':
-    simulacion()
+    return estado_sistema
 
 
 
