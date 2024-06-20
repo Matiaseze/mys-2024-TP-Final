@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import math
 # Tiempo simulacion
 
 
@@ -67,7 +67,7 @@ def procesar_pacientes(estado_sistema, dia, quirofanos, cantidad_pacientes):
             necesita_quirofano = np.random.uniform(0,1)
             if necesita_quirofano >= 0.43:
                 paciente = crear_paciente(dia, dia+cant_dias_internacion)
-                quirofano = quirofano_keys[quirofano_counter % num_quirofanos]
+                quirofano = quirofano_keys[np.random.randint(0,num_quirofanos)]
                 asignar_quirofano(paciente,quirofanos, quirofano)
                 quirofano_counter += 1
                 pacientes_con_reserva += 1
@@ -108,6 +108,8 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
         'disponibilidad_camas': [CAMAS_TOTALES] * DIAS_SIMULACION,
 
         'pacientes_rechazados_por_dia': [],
+        'pacientes_rechazados_por_ausencia_camas': [],
+        'pacientes_rechazados_por_internacion_agotada': [],
         'pacientes_sin_reserva_por_dia': [], 
         'kits_diarios_disponibles': [],
         'kits_diarios_utilizados': [],
@@ -124,14 +126,16 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
         'total_cirugias_reprogramadas_por_cuota_diaria': 0,
         'total_cirugias_concretadas': 0,
         'total_cirugias_rechazadas': 0,
-        'total_pacientes_rechazados': 0
+        'total_pacientes_rechazados_por_ausencia_camas': 0,
+        'total_pacientes_rechazados_por_internacion_agotada': 0
+
 
     }
 
     cirugias_concretadas = 0
     cirugias_rechazadas = 0
-    pacientes_rechazados = 0
-
+    pacientes_rechazados_por_ausencia_camas = 0
+    pacientes_rechazados_por_internacion_agotada = 0
     
     kits_disponibles = estado_sistema['kits_iniciales']
 
@@ -139,6 +143,8 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
     quirofanos, ocupacion_quirofanos = inicializar_quirofanos(CANT_QUIROFANOS)
     
     for dia in range(DIAS_SIMULACION):
+
+        lista_tiempo_espera = []
         
         ocupacion_quirofanos = {key: 0 for key in ocupacion_quirofanos}
 
@@ -154,7 +160,7 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
         if estado_sistema['disponibilidad_camas'][dia] >= llegadas:
             procesar_pacientes(estado_sistema, dia, quirofanos, llegadas)
         else:
-            pacientes_rechazados += llegadas - estado_sistema['disponibilidad_camas'][dia]
+            pacientes_rechazados_por_ausencia_camas += llegadas - estado_sistema['disponibilidad_camas'][dia]
             camas_disponibles = estado_sistema['disponibilidad_camas'][dia]
             procesar_pacientes(estado_sistema, dia, quirofanos, camas_disponibles)
 
@@ -181,13 +187,14 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
                         kits_disponibles -= 1
                         kits_utilizados += 1
                         cirugias_concretadas += 1
-                        estado_sistema['tiempo_espera_diario_quirofanos'].append(dia - paciente['dia_internacion']) # El tiempo que esperan los pacientes para ingresar al quirofano
+                        lista_tiempo_espera.append(dia - paciente['dia_internacion'])
+                         # El tiempo que esperan los pacientes para ingresar al quirofano
                     else:
                         cirugias_reprogramadas_por_insumos += 1
                         quirofanos[quirofano].insert(0, paciente)
 
                 else: # Caso de rechazo
-                    pacientes_rechazados += 1
+                    pacientes_rechazados_por_internacion_agotada += 1
                     cirugias_rechazadas += 1
                     
             if kits_disponibles == 0:
@@ -197,16 +204,19 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
             else:
                 cirugias_reprogramadas_por_cuota_diaria = len(quirofanos[quirofano])
 
-
             estado_sistema['total_cirugias_reprogramadas_por_insumos'] += cirugias_reprogramadas_por_insumos
             estado_sistema['total_cirugias_reprogramadas_por_tiempo'] += cirugias_reprogramadas_por_tiempo
             estado_sistema['total_cirugias_reprogramadas_por_cuota_diaria'] += cirugias_reprogramadas_por_cuota_diaria
+        tiempo_espera_max = max(lista_tiempo_espera) if len(lista_tiempo_espera) > 0 else 0
+        estado_sistema['tiempo_espera_diario_quirofanos'].append(tiempo_espera_max)
 
         # Contadores que son por dia.
         estado_sistema['kits_diarios_utilizados'].append(kits_utilizados)
         estado_sistema['kits_diarios_disponibles'].append(kits_disponibles)
         estado_sistema['ocupacion_diaria_quirofanos'].append(ocupacion_quirofanos)
-        estado_sistema['pacientes_rechazados_por_dia'].append(pacientes_rechazados)
+        estado_sistema['pacientes_rechazados_por_ausencia_camas'].append(pacientes_rechazados_por_ausencia_camas)
+        estado_sistema['pacientes_rechazados_por_internacion_agotada'].append(pacientes_rechazados_por_internacion_agotada)
+
         estado_sistema['cirugias_rechazadas_por_dia'].append(cirugias_rechazadas)
         estado_sistema['cirugias_concretadas_por_dia'].append(cirugias_concretadas)
         estado_sistema['cirugias_reprogramadas_por_insumos'].append(cirugias_reprogramadas_por_insumos)
@@ -217,7 +227,9 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
 
     estado_sistema['total_cirugias_concretadas'] += cirugias_concretadas
     estado_sistema['total_cirugias_rechazadas'] += cirugias_rechazadas
-    estado_sistema['total_pacientes_rechazados'] += pacientes_rechazados
+    estado_sistema['total_pacientes_rechazados_por_ausencia_camas'] += pacientes_rechazados_por_ausencia_camas
+    estado_sistema['total_pacientes_rechazados_por_internacion_agotada'] += pacientes_rechazados_por_internacion_agotada
+
     
     # print(f'Cantidad de quirofanos:', estado_sistema['cantidad de quirofanos:'],'\n',
     #       'Kits iniciales:', estado_sistema['kits_iniciales'], '\n',
