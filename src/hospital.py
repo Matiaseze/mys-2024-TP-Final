@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import random
 # Tiempo simulacion
 
 
@@ -165,8 +166,10 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
             procesar_pacientes(estado_sistema, dia, quirofanos, camas_disponibles)
 
         '''INICIO HORARIO ATENCION'''
+        quirofanos_keys = list(quirofanos.keys())
+        random.shuffle(quirofanos_keys)
 
-        for quirofano in quirofanos:
+        for quirofano in quirofanos_keys:
             
             cantidad_cirugias = generar_cantidad_cirugias_diarias()
             contador_cirugia = 0
@@ -257,5 +260,146 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
 
     return estado_sistema
 
+def calcular_porentaje_ocupacion_quirofanos(estado_sistema):
+    totales = {k: 0 for k in estado_sistema["ocupacion_diaria_quirofanos"][0].keys()}
+    for quirofanos in estado_sistema["ocupacion_diaria_quirofanos"]:
+        for k, v in quirofanos.items():
+                totales[k] += v
+
+    for k, v in totales.items():
+        totales[k] = round((totales[k] * 100) / (estado_sistema["dias_simulacion"] * 12))
+    return totales
+        
+
+def graficar(estado_sistema):
+    # Días de la simulación
+    dias_simulacion = estado_sistema['dias_simulacion']
+    
+    # Calcular el uso de kits mensualmente
+    uso_kits_mensual = []
+    kits_disponibles_mensual = []
+    camas_disponibles_mensual = []
+    demanda_mensual = []
+    reserva_quirofanos_mensual = []
+    cirugias_concretadas_mensual = []
+    cirugias_reprogramadas_por_insumos_mensual = []
+    cirugias_reprogramadas_por_tiempo_mensual = []
+    cirugias_reprogramadas_por_cuota_mensual = []
+    
+    for i in range(0, dias_simulacion, 30):  # Agrupar en meses (aproximadamente 30 días por mes)
+        uso_mes = sum(estado_sistema['kits_diarios_utilizados'][i:i+30])
+        uso_kits_mensual.append(uso_mes)
+
+        kit_mes = sum(estado_sistema['kits_diarios_disponibles'][i:i+30])
+        kits_disponibles_mensual.append(kit_mes)
+
+        cama_mes = np.mean(estado_sistema['disponibilidad_camas'][i:i+30])
+        camas_disponibles_mensual.append(cama_mes)
+
+        demanda_mes = sum(estado_sistema['llegadas_por_dia'][i:i+30])
+        demanda_mensual.append(demanda_mes)
+
+        reserva_mes = sum(estado_sistema['reservas_por_dia'][i:i+30])
+        reserva_quirofanos_mensual.append(reserva_mes)
+
+        cirugias_concretada_por_mes = sum(estado_sistema['cirugias_concretadas_por_dia'][i:i+30])
+        cirugias_concretadas_mensual.append(cirugias_concretada_por_mes)
+
+        cirugias_reprogramadas_por_insumos_por_mes = sum(estado_sistema['cirugias_reprogramadas_por_insumos'][i:i+30])
+        cirugias_reprogramadas_por_insumos_mensual.append(cirugias_reprogramadas_por_insumos_por_mes)
+
+        cirugias_reprogramadas_por_tiempo_por_mes = sum(estado_sistema['cirugias_reprogramadas_por_tiempo'][i:i+30])
+        cirugias_reprogramadas_por_tiempo_mensual.append(cirugias_reprogramadas_por_tiempo_por_mes)
+
+        cirugias_reprogramadas_por_cuota_por_mes = sum(estado_sistema['cirugias_reprogramadas_por_cuota_diaria'][i:i+30])
+        cirugias_reprogramadas_por_cuota_mensual.append(cirugias_reprogramadas_por_cuota_por_mes)
+
+    # Meses para el gráfico
+    meses = np.arange(0, len(uso_kits_mensual))
+    
+    # Graficar la utilización de kits mensualmente
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, uso_kits_mensual, color='skyblue')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Cantidad de Kits')
+    plt.title('Uso Mensual de Kits')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/uso_mensual_kits.png', dpi=300)
+
+    # Graficar la diponibilidad de kits mensualmente
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, kits_disponibles_mensual, color='red')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Kits disponibles')
+    plt.title('Kits disponibles mensualmente')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/disponibilidad_mensual_kits.png', dpi=300)
+
+        # Graficar la diponibilidad de kits mensualmente
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, camas_disponibles_mensual, color='blue')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Camas disponibles')
+    plt.title('Camas disponibles mensualmente')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/disponibilidad_mensual_camas.png', dpi=300)
+
+        # Graficar la diponibilidad de kits mensualmente
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, demanda_mensual , color='blue')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Demanda')
+    plt.title('Demanda mensual')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/demanda_mensual.png', dpi=300)
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, reserva_quirofanos_mensual , color='green')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Reserva')
+    plt.title('Reserva de quirofanos mensual')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/reserva_mensual.png', dpi=300)
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, cirugias_concretadas_mensual , color='green')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Cirugias concretadas')
+    plt.title('Cirugias concretadas mensuales')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/cirugias_concretadas_mensual.png', dpi=300)
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, cirugias_reprogramadas_por_insumos_mensual, color='green')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Cirugias reprogramadas por insumos')
+    plt.title('Cirugias reprogramadas por insumos por mes')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/cirugias_reprogramadas_por_insumos_mensual.png', dpi=300)
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, cirugias_reprogramadas_por_tiempo_mensual, color='lime')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Cirugias reprogramadas por tiempo')
+    plt.title('Cirugias reprogramadas por falta de tiempo de internacion por mes')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/cirugias_reprogramadas_por_tiempo_mensual.png', dpi=300)
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, cirugias_reprogramadas_por_cuota_mensual, color='lime')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Cirugias reprogramadas por cuota')
+    plt.title('Cirugias reprogramadas por cuota diaria excedida por mes')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/cirugias_reprogramadas_por_cuota_mensual.png', dpi=300)
 
 

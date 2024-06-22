@@ -19,9 +19,25 @@ def index():
         reposicion_diaria_inventario = int(request.form['reposicionDiariaInventario'])
 
         estado = simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencion_quirofanos,inventario_inicial,reposicion_diaria_inventario)
-        return jsonify(estado) 
+        graficar(estado)
+        
+        return render_template('simuladorHospital.html',
+                                aniosSimulacion = anios_simulacion,
+                                cantidadCamas = cantidad_camas,
+                                cantidadQuirofanos = cantidad_quirofanos,
+                                cantidadHorasAtencionQuirofanos = horas_atencion_quirofanos,
+                                inventarioInicial = inventario_inicial,
+                                reposicionDiariaInventario = reposicion_diaria_inventario,
+                                huboSimulacion = True) 
     
-    return render_template('simuladorHospital.html')
+    return render_template('simuladorHospital.html',                                 
+                           aniosSimulacion = 2,
+                           cantidadCamas = 210,
+                           cantidadQuirofanos = 4,
+                           cantidadHorasAtencionQuirofanos = 12,
+                           inventarioInicial = 130,
+                           reposicionDiariaInventario = 4,
+                           huboSimulacion = False)
 
 if __name__ == '__main__':
     

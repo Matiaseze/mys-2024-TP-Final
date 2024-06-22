@@ -353,42 +353,42 @@
                             <div class="bd-example m-0 border-0">
                                 <form action="" method="post">
                                     <div class="form-floating mb-3">
-                                        <input type="number" class="form-control is-valid" id="aniosSimulacion" name="aniosSimulacion" placeholder="A&ntilde;os de simulaci&oacute;n" min="1" max="10" value="2" required>
+                                        <input type="number" class="form-control is-valid" id="aniosSimulacion" name="aniosSimulacion" placeholder="A&ntilde;os de simulaci&oacute;n" min="1" max="10" value="{{ aniosSimulacion }}" required>
                                         <label for="floatingInput">A&ntilde;os de simulaci&oacute;n</label>
                                         <div class="invalid-feedback">
                                             Indique los a&ntilde;os de simulaci&oacute;n...
                                         </div>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="number" class="form-control is-valid" id="cantidadCamas" name="cantidadCamas" placeholder="Cantidad de camas" min="100" max="1000" value="210" required>
+                                        <input type="number" class="form-control is-valid" id="cantidadCamas" name="cantidadCamas" placeholder="Cantidad de camas" min="100" max="1000" value="{{ cantidadCamas }}" required>
                                         <label for="cantidadCamas">Cantidad de camas</label>
                                         <div class="invalid-feedback">
                                             Indique la cantidad de camas...
                                         </div>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="number" class="form-control is-valid" id="cantidadQuirofanos" name="cantidadQuirofanos" placeholder="Cantidad de quir&oacute;fanos" min="1" max="10" value="4" required>
+                                        <input type="number" class="form-control is-valid" id="cantidadQuirofanos" name="cantidadQuirofanos" placeholder="Cantidad de quir&oacute;fanos" min="1" max="10" value="{{ cantidadQuirofanos }}" required>
                                         <label for="cantidadQuirofanos">Cantidad de quir&oacute;fanos</label>
                                         <div class="invalid-feedback">
                                             Indique la cantidad de quir&oacute;fanos...
                                         </div>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="number" class="form-control is-valid" id="cantidadHorasAtencionQuirofanos" name="cantidadHorasAtencionQuirofanos" placeholder="Cantidad de horas de atenci&oacute;n de los quir&oacute;fanos" min="12" max="24" value="12" required>
+                                        <input type="number" class="form-control is-valid" id="cantidadHorasAtencionQuirofanos" name="cantidadHorasAtencionQuirofanos" placeholder="Cantidad de horas de atenci&oacute;n de los quir&oacute;fanos" min="12" max="24" value="{{ cantidadHorasAtencionQuirofanos }}" required>
                                         <label for="cantidadHorasAtencionQuirofanos">Cantidad de horas de atenci&oacute;n de los quir&oacute;fanos</label>
                                         <div class="invalid-feedback">
                                             Indique la cantidad de horas de atenci&oacute;n de los quir&oacute;fanos...
                                         </div>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="number" class="form-control is-valid" id="inventarioInicial" name="inventarioInicial" placeholder="Inventario inicial de kits m&eacute;dicos" min="100" max="500" value="130" required>
+                                        <input type="number" class="form-control is-valid" id="inventarioInicial" name="inventarioInicial" placeholder="Inventario inicial de kits m&eacute;dicos" min="0" max="500" value="{{ inventarioInicial }}" required>
                                         <label for="inventarioInicial">Inventario inicial de kits m&eacute;dicos</label>
                                         <div class="invalid-feedback">
                                             Indique el inventario inicial de kits m&eacute;dicos...
                                         </div>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="number" class="form-control is-valid" id="reposicionDiariaInventario" name="reposicionDiariaInventario" placeholder="Reposici&oacute;n diaria del inventario" min="1" max="500" value="4" required>
+                                        <input type="number" class="form-control is-valid" id="reposicionDiariaInventario" name="reposicionDiariaInventario" placeholder="Reposici&oacute;n diaria del inventario" min="1" max="500" value="{{ reposicionDiariaInventario }}" required>
                                         <label for="reposicionDiariaInventario">Reposici&oacute;n diaria del inventario</label>
                                         <div class="invalid-feedback">
                                             Indique la reposici&oacute;n diaria del inventario...
@@ -404,6 +404,38 @@
                     </div>
                 </article>
             </section>
+            {% if huboSimulacion %}
+                <section id="seccionResultados">
+                    <article class="my-3" id="floating-labels">
+                        <div class="bd-heading sticky-xl-top align-self-start mt-5 mb-3 mt-xl-0 mb-xl-2">
+                            <h3>Resultados</h3>
+                        </div>
+                        <div>
+                            <div class="bd-example-snippet bd-code-snippet">
+                                <div class="bd-example m-0 border-0">
+                                    <img src="{{ url_for('static', filename='img/resultados/demanda_mensual.png') }}" class="me-3" width="640" height="480">
+                                    <br>
+                                    <img src="{{ url_for('static', filename='img/resultados/disponibilidad_mensual_camas.png') }}" class="me-3" width="640" height="480">
+                                    <br>
+                                    <img src="{{ url_for('static', filename='img/resultados/reserva_mensual.png') }}" class="me-3" width="640" height="480">
+                                    <br>
+                                    <img src="{{ url_for('static', filename='img/resultados/uso_mensual_kits.png') }}" class="me-3" width="640" height="480">
+                                    <br>
+                                    <img src="{{ url_for('static', filename='img/resultados/disponibilidad_mensual_kits.png') }}" class="me-3" width="640" height="480">
+                                    <br>
+                                    <img src="{{ url_for('static', filename='img/resultados/cirugias_concretadas_mensual.png') }}" class="me-3" width="640" height="480">
+                                    <br>
+                                    <img src="{{ url_for('static', filename='img/resultados/cirugias_reprogramadas_por_insumos_mensual.png') }}" class="me-3" width="640" height="480">
+                                    <br>
+                                    <img src="{{ url_for('static', filename='img/resultados/cirugias_reprogramadas_por_tiempo_mensual.png') }}" class="me-3" width="640" height="480">
+                                    <br>
+                                    <img src="{{ url_for('static', filename='img/resultados/cirugias_reprogramadas_por_cuota_mensual.png') }}" class="me-3" width="640" height="480">
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+            {% endif %}
         </div>
     </body>
 </html>
