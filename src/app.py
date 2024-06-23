@@ -1,11 +1,14 @@
 from flask import Flask, request, render_template, jsonify
 # from config import config
 from hospital import *
+import os
 
 app = Flask(__name__)
     
 @app.route('/', methods=['GET', 'POST'])
 def index():
+
+    path = os.path.join(app.root_path, 'static', 'img', 'resultados')
 
     if request.method == 'POST':
 
@@ -19,7 +22,7 @@ def index():
         reposicion_diaria_inventario = int(request.form['reposicionDiariaInventario'])
 
         estado = simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencion_quirofanos,inventario_inicial,reposicion_diaria_inventario)
-        graficar(estado)
+        graficar(path, estado)
         
         return render_template('simuladorHospital.html',
                                 aniosSimulacion = anios_simulacion,

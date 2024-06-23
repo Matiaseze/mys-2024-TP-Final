@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import math
+import os
 import random
 # Tiempo simulacion
 
@@ -102,7 +102,7 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
     estado_sistema = {
 
         'dias_simulacion': DIAS_SIMULACION,
-        'cantidad de quirofanos:': CANT_QUIROFANOS,
+        'cantidad_de_quirofanos': CANT_QUIROFANOS,
         'kits_iniciales': KITS_INICIALES,
         'llegadas_por_dia': [],
         'reservas_por_dia': [],
@@ -133,23 +133,23 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
 
     }
 
-    cirugias_concretadas = 0
-    cirugias_rechazadas = 0
-    pacientes_rechazados_por_ausencia_camas = 0
-    pacientes_rechazados_por_internacion_agotada = 0
     
-    kits_disponibles = estado_sistema['kits_iniciales']
+    kits_disponibles = KITS_INICIALES
 
     
     quirofanos, ocupacion_quirofanos = inicializar_quirofanos(CANT_QUIROFANOS)
     
     for dia in range(DIAS_SIMULACION):
 
+        cirugias_concretadas = 0
+        cirugias_rechazadas = 0
+        pacientes_rechazados_por_ausencia_camas = 0
+        pacientes_rechazados_por_internacion_agotada = 0
         lista_tiempo_espera = []
         
         ocupacion_quirofanos = {key: 0 for key in ocupacion_quirofanos}
 
-        kits_disponibles += KITS_REPOSICION_DIARIA #Incrementar kits diariamente
+        kits_disponibles += KITS_REPOSICION_DIARIA # Incrementar kits diariamente
         kits_utilizados = 0
 
         '''ORGANIZACION DE LA DEMANDA'''
@@ -200,7 +200,7 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
                     pacientes_rechazados_por_internacion_agotada += 1
                     cirugias_rechazadas += 1
                     
-            if kits_disponibles == 0:
+            if not hay_kits(kits_disponibles):
                 cirugias_reprogramadas_por_insumos = len(quirofanos[quirofano])
             elif ocupacion_quirofanos[quirofano] > CANT_HORAS_ATENCION_QUIROFANO:
                 cirugias_reprogramadas_por_tiempo = len(quirofanos[quirofano])
@@ -228,35 +228,11 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
     
     # Contadores totales
 
-    estado_sistema['total_cirugias_concretadas'] += cirugias_concretadas
-    estado_sistema['total_cirugias_rechazadas'] += cirugias_rechazadas
-    estado_sistema['total_pacientes_rechazados_por_ausencia_camas'] += pacientes_rechazados_por_ausencia_camas
-    estado_sistema['total_pacientes_rechazados_por_internacion_agotada'] += pacientes_rechazados_por_internacion_agotada
+    estado_sistema['total_cirugias_concretadas'] = sum(estado_sistema['cirugias_concretadas_por_dia'])
+    estado_sistema['total_cirugias_rechazadas'] = sum(estado_sistema['cirugias_rechazadas_por_dia'])
+    estado_sistema['total_pacientes_rechazados_por_ausencia_camas'] = sum(estado_sistema['pacientes_rechazados_por_ausencia_camas'])
+    estado_sistema['total_pacientes_rechazados_por_internacion_agotada'] = sum(estado_sistema['pacientes_rechazados_por_internacion_agotada'])
 
-    
-    # print(f'Cantidad de quirofanos:', estado_sistema['cantidad de quirofanos:'],'\n',
-    #       'Kits iniciales:', estado_sistema['kits_iniciales'], '\n',
-    #       'Kits disponibles:', estado_sistema['kits_diarios_disponibles'], '\n',
-    #       'kits utilizados por dia:', estado_sistema['kits_diarios_utilizados'], '\n',
-    #       'llegada de pacientes por dia:', estado_sistema['llegadas_por_dia'], '\n',
-    #       'reservas de quirofano por dia:', estado_sistema['reservas_por_dia'], '\n',
-    #       'disponibilidad de camas por dia:', estado_sistema['disponibilidad_camas'], '\n',
-    #       'ocupacion diaria quirofanos (en horas):', estado_sistema['ocupacion_diaria_quirofanos'], '\n',
-    #       'cuanto esperan los pacientes por dia en ser operados:', estado_sistema['tiempo_espera_diario_quirofanos'] , '\n',
-    #       'pacientes que solo se internaron:', estado_sistema['pacientes_sin_reserva_por_dia'], '\n',
-    #       'pacientes rechazados por dia:', estado_sistema['pacientes_rechazados_por_dia'], '\n',
-    #       'cirugias concretadas por dia:', estado_sistema['cirugias_concretadas_por_dia'], '\n',
-    #       'cirugias diarias reprogramadas por falta de insumos:', estado_sistema['cirugias_reprogramadas_por_insumos'], '\n',
-    #       'cirugias diaria reprogramadas al otro dia por ocupacion del quirofano:', estado_sistema['cirugias_reprogramadas_por_tiempo'], '\n',
-    #       'cirugias diaria reprogramadas al otro dia por cuota diria:', estado_sistema['cirugias_reprogramadas_por_cuota_diaria'], '\n',
-    #       'Total de cirugias reprogramadas por falta insumos:', estado_sistema['total_cirugias_reprogramadas_por_insumos'], '\n',
-    #       'Total de cirugias reprogramadas por falta de tiempo:', estado_sistema['total_cirugias_reprogramadas_por_tiempo'], '\n',
-    #       'Total de cirugias reprogramadas por cuota diaria:', estado_sistema['total_cirugias_reprogramadas_por_cuota_diaria'], '\n',
-    #       'Total cirugias concretadas:', estado_sistema['total_cirugias_concretadas'], '\n',
-    #       'Total cirugias rechazadas:', estado_sistema['total_cirugias_rechazadas'], '\n',
-    #       'Total pacientes rechazados:', estado_sistema['total_pacientes_rechazados']
-
-    #       )
 
     return estado_sistema
 
@@ -268,10 +244,11 @@ def calcular_porentaje_ocupacion_quirofanos(estado_sistema):
 
     for k, v in totales.items():
         totales[k] = round((totales[k] * 100) / (estado_sistema["dias_simulacion"] * 12))
+    
     return totales
         
 
-def graficar(estado_sistema):
+def graficar(path_resultados, estado_sistema):
     # Días de la simulación
     dias_simulacion = estado_sistema['dias_simulacion']
     
@@ -285,12 +262,16 @@ def graficar(estado_sistema):
     cirugias_reprogramadas_por_insumos_mensual = []
     cirugias_reprogramadas_por_tiempo_mensual = []
     cirugias_reprogramadas_por_cuota_mensual = []
+    pacientes_rechazados_por_falta_de_camas = []
+    pacientes_rechazados_por_internacion_agotada = []
+    promedio_espera_por_tiempo_espera_quirofanos_mensual = []
+    ocupacion_total_de_quirofanos = {k: 0 for k in estado_sistema["ocupacion_diaria_quirofanos"][0].keys()}
     
     for i in range(0, dias_simulacion, 30):  # Agrupar en meses (aproximadamente 30 días por mes)
-        uso_mes = sum(estado_sistema['kits_diarios_utilizados'][i:i+30])
+        uso_mes = np.mean(estado_sistema['kits_diarios_utilizados'][i:i+30])
         uso_kits_mensual.append(uso_mes)
 
-        kit_mes = sum(estado_sistema['kits_diarios_disponibles'][i:i+30])
+        kit_mes = np.mean(estado_sistema['kits_diarios_disponibles'][i:i+30])
         kits_disponibles_mensual.append(kit_mes)
 
         cama_mes = np.mean(estado_sistema['disponibilidad_camas'][i:i+30])
@@ -302,7 +283,7 @@ def graficar(estado_sistema):
         reserva_mes = sum(estado_sistema['reservas_por_dia'][i:i+30])
         reserva_quirofanos_mensual.append(reserva_mes)
 
-        cirugias_concretada_por_mes = sum(estado_sistema['cirugias_concretadas_por_dia'][i:i+30])
+        cirugias_concretada_por_mes = np.mean(estado_sistema['cirugias_concretadas_por_dia'][i:i+30])
         cirugias_concretadas_mensual.append(cirugias_concretada_por_mes)
 
         cirugias_reprogramadas_por_insumos_por_mes = sum(estado_sistema['cirugias_reprogramadas_por_insumos'][i:i+30])
@@ -314,38 +295,49 @@ def graficar(estado_sistema):
         cirugias_reprogramadas_por_cuota_por_mes = sum(estado_sistema['cirugias_reprogramadas_por_cuota_diaria'][i:i+30])
         cirugias_reprogramadas_por_cuota_mensual.append(cirugias_reprogramadas_por_cuota_por_mes)
 
+        pacientes_rechazados_por_falta_de_camas_por_mes = sum(estado_sistema['pacientes_rechazados_por_ausencia_camas'][i:i+30])
+        pacientes_rechazados_por_falta_de_camas.append(pacientes_rechazados_por_falta_de_camas_por_mes)
+        
+        pacientes_rechazados_por_internacion_agotada_por_mes = np.mean(estado_sistema['pacientes_rechazados_por_internacion_agotada'][i:i+30])
+        pacientes_rechazados_por_internacion_agotada.append(pacientes_rechazados_por_internacion_agotada_por_mes)
+        
+        promedio_espera_por_tiempo_espera_quirofanos_por_mes = np.mean(estado_sistema['tiempo_espera_diario_quirofanos'][i:i+30])
+        promedio_espera_por_tiempo_espera_quirofanos_mensual.append(promedio_espera_por_tiempo_espera_quirofanos_por_mes)
+        
+
     # Meses para el gráfico
     meses = np.arange(0, len(uso_kits_mensual))
     
     # Graficar la utilización de kits mensualmente
     plt.figure(figsize=(10, 6))
-    plt.bar(meses, uso_kits_mensual, color='skyblue')
+    plt.bar(meses, uso_kits_mensual, color='red')
     plt.xlabel('Mes de Simulación')
     plt.ylabel('Cantidad de Kits')
-    plt.title('Uso Mensual de Kits')
+    plt.title('Uso promedio mensual de Kits')
     plt.xticks(meses)
     plt.grid(axis='y')
-    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/uso_mensual_kits.png', dpi=300)
+    plt.savefig(os.path.join(path_resultados, 'uso_mensual_kits.png'), dpi=300)
 
     # Graficar la diponibilidad de kits mensualmente
     plt.figure(figsize=(10, 6))
     plt.bar(meses, kits_disponibles_mensual, color='red')
     plt.xlabel('Mes de Simulación')
     plt.ylabel('Kits disponibles')
-    plt.title('Kits disponibles mensualmente')
+    plt.title('Promedio de kits disponibles mensualmente')
     plt.xticks(meses)
     plt.grid(axis='y')
-    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/disponibilidad_mensual_kits.png', dpi=300)
+    plt.savefig(os.path.join(path_resultados, 'disponibilidad_mensual_kits.png'), dpi=300)
+ 
 
         # Graficar la diponibilidad de kits mensualmente
     plt.figure(figsize=(10, 6))
     plt.bar(meses, camas_disponibles_mensual, color='blue')
     plt.xlabel('Mes de Simulación')
     plt.ylabel('Camas disponibles')
-    plt.title('Camas disponibles mensualmente')
+    plt.title('Promedio de camas disponibles mensualmente')
     plt.xticks(meses)
     plt.grid(axis='y')
-    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/disponibilidad_mensual_camas.png', dpi=300)
+    plt.savefig(os.path.join(path_resultados, 'disponibilidad_mensual_camas.png'), dpi=300)
 
         # Graficar la diponibilidad de kits mensualmente
     plt.figure(figsize=(10, 6))
@@ -355,7 +347,7 @@ def graficar(estado_sistema):
     plt.title('Demanda mensual')
     plt.xticks(meses)
     plt.grid(axis='y')
-    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/demanda_mensual.png', dpi=300)
+    plt.savefig(os.path.join(path_resultados, 'demanda_mensual.png'), dpi=300)
 
     plt.figure(figsize=(10, 6))
     plt.bar(meses, reserva_quirofanos_mensual , color='green')
@@ -364,25 +356,26 @@ def graficar(estado_sistema):
     plt.title('Reserva de quirofanos mensual')
     plt.xticks(meses)
     plt.grid(axis='y')
-    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/reserva_mensual.png', dpi=300)
+    plt.savefig(os.path.join(path_resultados, 'reserva_mensual.png'), dpi=300)
 
     plt.figure(figsize=(10, 6))
-    plt.bar(meses, cirugias_concretadas_mensual , color='green')
+    plt.bar(meses, cirugias_concretadas_mensual , color='lime')
     plt.xlabel('Mes de Simulación')
     plt.ylabel('Cirugias concretadas')
     plt.title('Cirugias concretadas mensuales')
     plt.xticks(meses)
     plt.grid(axis='y')
-    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/cirugias_concretadas_mensual.png', dpi=300)
+    plt.savefig(os.path.join(path_resultados, 'cirugias_concretadas_mensual.png'), dpi=300)
 
     plt.figure(figsize=(10, 6))
-    plt.bar(meses, cirugias_reprogramadas_por_insumos_mensual, color='green')
+    plt.bar(meses, cirugias_reprogramadas_por_insumos_mensual, color='lime')
     plt.xlabel('Mes de Simulación')
     plt.ylabel('Cirugias reprogramadas por insumos')
     plt.title('Cirugias reprogramadas por insumos por mes')
     plt.xticks(meses)
     plt.grid(axis='y')
-    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/cirugias_reprogramadas_por_insumos_mensual.png', dpi=300)
+    plt.savefig(os.path.join(path_resultados, 'cirugias_reprogramadas_por_insumos_mensual.png'), dpi=300)
+    
 
     plt.figure(figsize=(10, 6))
     plt.bar(meses, cirugias_reprogramadas_por_tiempo_mensual, color='lime')
@@ -391,7 +384,7 @@ def graficar(estado_sistema):
     plt.title('Cirugias reprogramadas por falta de tiempo de internacion por mes')
     plt.xticks(meses)
     plt.grid(axis='y')
-    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/cirugias_reprogramadas_por_tiempo_mensual.png', dpi=300)
+    plt.savefig(os.path.join(path_resultados, 'cirugias_reprogramadas_por_tiempo_mensual.png'), dpi=300)
 
     plt.figure(figsize=(10, 6))
     plt.bar(meses, cirugias_reprogramadas_por_cuota_mensual, color='lime')
@@ -400,6 +393,58 @@ def graficar(estado_sistema):
     plt.title('Cirugias reprogramadas por cuota diaria excedida por mes')
     plt.xticks(meses)
     plt.grid(axis='y')
-    plt.savefig('C:/Users/mati_/Desktop/Uni/MyS/mys-2024-TP-Final/src/static/img/resultados/cirugias_reprogramadas_por_cuota_mensual.png', dpi=300)
+    plt.savefig(os.path.join(path_resultados, 'cirugias_reprogramadas_por_cuota_mensual.png'), dpi=300)
 
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, pacientes_rechazados_por_falta_de_camas, color='orange')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Pacientes rechazados por falta de camas')
+    plt.title('Pacientes rechazados mensualmente por falta de camas')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig(os.path.join(path_resultados, 'pacientes_rechazados_por_falta_de_camas_por_mes.png'), dpi=300)
 
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, pacientes_rechazados_por_internacion_agotada, color='orange')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Pacientes rechazados por internacion agotada')
+    plt.title('Pacientes rechazados mensualmente por internacion agotada')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig(os.path.join(path_resultados, 'pacientes_rechazados_por_internacion_agotada_por_mes.png'), dpi=300)
+    
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, promedio_espera_por_tiempo_espera_quirofanos_mensual, color='orange')
+    plt.xlabel('Mes de Simulación')
+    plt.ylabel('Pacientes en espera')
+    plt.title('Promedio que los pacientes esperan internados')
+    plt.xticks(meses)
+    plt.grid(axis='y')
+    plt.savefig(os.path.join(path_resultados, 'promedio_espera_por_tiempo_espera_quirofanos_mensual.png'), dpi=300)
+
+    for quirofanos in estado_sistema["ocupacion_diaria_quirofanos"]:
+        for k, v in quirofanos.items():
+                ocupacion_total_de_quirofanos[k] += v
+
+    for k, v in ocupacion_total_de_quirofanos.items():
+        ocupacion_total_de_quirofanos[k] = round((ocupacion_total_de_quirofanos[k] * 100) / (estado_sistema["dias_simulacion"] * 12))
+
+    meses = np.arange(0, len(ocupacion_total_de_quirofanos))
+
+    etiquetas = ['En uso','Ocioso']
+    colores=['skyblue','red']
+    # Determina el número de subplots
+    cols = 2
+    rows = (estado_sistema['cantidad_de_quirofanos'] + 1) // cols
+
+    fig, axs = plt.subplots(rows, cols, figsize=(10, 6))
+    for idx, (k, v) in enumerate(ocupacion_total_de_quirofanos.items()):
+            ax = axs[idx // cols, idx % cols]
+            datos = [v, 100 - v if (100 - v) >= 0 else 0 ]
+            titulo = str.replace(f'Porcentaje de ocupacion del {k}','_',' ')
+            ax.pie(datos,labels=etiquetas,autopct='%1.1f%%', colors=colores)
+            ax.set_title(titulo)
+            ax.axis('equal')
+
+    plt.savefig(os.path.join(path_resultados, 'grafico_porcentaje_ocupacion_quirofanos.png'), dpi=300)
+    plt.tight_layout()
