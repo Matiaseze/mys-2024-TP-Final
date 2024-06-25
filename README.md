@@ -50,8 +50,8 @@ Se recomienda crear un virtual environment para gestionar la depencias del proye
 
 Crear un entorno virtual en Linux
 
-```$ cd mys-2024-TP-Final
-$ python3 -m venv .venv```
+```$ cd mys-2024-TP-Final```
+```$ python3 -m venv .venv```
 
 Ejecutar 
 
@@ -71,7 +71,7 @@ Una vez instalado el entorno virtual, instalar flask con el siguiente comando:
 
 ```pip install Flask```
 
-#### Ejecutar
+#### Ejecutar aplicacion
 
 ```$ python src/app.py```
 
