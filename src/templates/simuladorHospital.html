@@ -447,7 +447,31 @@
                                         <img src="{{ url_for('static', filename='img/resultados/pacientes_rechazados_por_internacion_agotada_por_mes.png') }}" class="me-3" width="800" height="600">
                                     </div>
                                     <div class="form-floating mb-3">
+                                        <img src="{{ url_for('static', filename='img/resultados/promedio_espera_por_tiempo_espera_quirofanos_mensual.png') }}" class="me-3" width="800" height="600">
+                                    </div>
+                                    <div class="form-floating mb-3">
                                         <img src="{{ url_for('static', filename='img/resultados/grafico_porcentaje_ocupacion_quirofanos.png') }}" class="me-3" width="800" height="600">
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <img src="{{ url_for('static', filename='img/resultados/grafico_promedio_de_horas_de_ocupacion_quirofanos_mensual.png') }}" class="me-3" width="800" height="600">
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="bd-example-snippet bd-code-snippet">
+                                <div class="bd-example m-0 border-0">
+                                    <div class="form-floating mb-3"> 
+                                        <h2>Totales</h2> 
+                                        <ul>
+                                            <li><strong>Pacientes rechazados por ausencia de camas: </strong>{{ estadoSimulacion['total_pacientes_rechazados_por_ausencia_camas'] }}</li>
+                                            <li><strong>Pacientes rechazados por tiempo de internaci&oacute;n agotado: </strong>{{ estadoSimulacion['total_pacientes_rechazados_por_internacion_agotada'] }}</li>
+                                            <li><strong>Cirug&iacute;as concretadas: </strong>{{ estadoSimulacion['total_cirugias_concretadas'] }}</li>
+                                            <li><strong>Cirug&iacute;as rechazadas: </strong>{{ estadoSimulacion['total_cirugias_rechazadas'] }}</li>
+                                            <li><strong>Cirug&iacute;as reprogramadas por falta de insumos: </strong>{{ estadoSimulacion['total_cirugias_reprogramadas_por_insumos'] }}</li>
+                                            <li><strong>Cirug&iacute;as reprogramadas por cierre de quir&oacute;fano: </strong>{{ estadoSimulacion['total_cirugias_reprogramadas_por_tiempo'] }}</li>
+                                            <li><strong>Cirug&iacute;as reprogramadas por limite de cuota diaria excedida: </strong>{{ estadoSimulacion['total_cirugias_reprogramadas_por_cuota_diaria'] }}</li>
+                                            <li><strong>Tiempo promedio de espera de los pacientes: </strong>{{ estadoSimulacion['tiempo_espera_promedio_de_quirofanos'] }} d&iacute;as</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>

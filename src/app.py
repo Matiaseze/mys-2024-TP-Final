@@ -31,7 +31,8 @@ def index():
                                 cantidadHorasAtencionQuirofanos = horas_atencion_quirofanos,
                                 inventarioInicial = inventario_inicial,
                                 reposicionDiariaInventario = reposicion_diaria_inventario,
-                                huboSimulacion = True) 
+                                huboSimulacion = True,
+                                estadoSimulacion = estado) 
     
     return render_template('simuladorHospital.html',                                 
                            aniosSimulacion = 2,

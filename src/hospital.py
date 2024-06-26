@@ -128,7 +128,8 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
         'total_cirugias_concretadas': 0,
         'total_cirugias_rechazadas': 0,
         'total_pacientes_rechazados_por_ausencia_camas': 0,
-        'total_pacientes_rechazados_por_internacion_agotada': 0
+        'total_pacientes_rechazados_por_internacion_agotada': 0,
+        'tiempo_espera_promedio_de_quirofanos' : 0
 
 
     }
@@ -227,7 +228,7 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
         estado_sistema['cirugias_reprogramadas_por_cuota_diaria'].append(cirugias_reprogramadas_por_cuota_diaria)
     
     # Contadores totales
-
+    estado_sistema['tiempo_espera_promedio_de_quirofanos'] = np.mean(estado_sistema['tiempo_espera_diario_quirofanos'])
     estado_sistema['total_cirugias_concretadas'] = sum(estado_sistema['cirugias_concretadas_por_dia'])
     estado_sistema['total_cirugias_rechazadas'] = sum(estado_sistema['cirugias_rechazadas_por_dia'])
     estado_sistema['total_pacientes_rechazados_por_ausencia_camas'] = sum(estado_sistema['pacientes_rechazados_por_ausencia_camas'])
@@ -236,8 +237,9 @@ def simulacion(anios_simulacion,cantidad_camas,cantidad_quirofanos,horas_atencio
 
     return estado_sistema
 
-def calcular_porentaje_ocupacion_quirofanos(estado_sistema):
+def calcular_porentaje_ocupacion_quirofanos_total(estado_sistema):
     totales = {k: 0 for k in estado_sistema["ocupacion_diaria_quirofanos"][0].keys()}
+    
     for quirofanos in estado_sistema["ocupacion_diaria_quirofanos"]:
         for k, v in quirofanos.items():
                 totales[k] += v
@@ -246,7 +248,21 @@ def calcular_porentaje_ocupacion_quirofanos(estado_sistema):
         totales[k] = round((totales[k] * 100) / (estado_sistema["dias_simulacion"] * 12))
     
     return totales
-        
+
+def calcular_promedio_de_horas_de_ocupacion_quirofanos_mensual(estado_sistema):
+    totales = {k: [] for k in estado_sistema["ocupacion_diaria_quirofanos"][0].keys()}
+
+    for k in totales.keys():
+
+        for i in range(0, len(estado_sistema["ocupacion_diaria_quirofanos"]), 30):
+
+            uso_mes = [estado_sistema['ocupacion_diaria_quirofanos'][j][k] for j in range(i, min(i+30, len(estado_sistema["ocupacion_diaria_quirofanos"])))]
+            promedio_mes = np.mean(uso_mes)
+            totales[k].append(promedio_mes)
+
+    return totales
+
+
 
 def graficar(path_resultados, estado_sistema):
     # Días de la simulación
@@ -265,7 +281,7 @@ def graficar(path_resultados, estado_sistema):
     pacientes_rechazados_por_falta_de_camas = []
     pacientes_rechazados_por_internacion_agotada = []
     promedio_espera_por_tiempo_espera_quirofanos_mensual = []
-    ocupacion_total_de_quirofanos = {k: 0 for k in estado_sistema["ocupacion_diaria_quirofanos"][0].keys()}
+    # ocupacion_total_de_quirofanos = {k: 0 for k in estado_sistema["ocupacion_diaria_quirofanos"][0].keys()}
     
     for i in range(0, dias_simulacion, 30):  # Agrupar en meses (aproximadamente 30 días por mes)
         uso_mes = np.mean(estado_sistema['kits_diarios_utilizados'][i:i+30])
@@ -416,20 +432,20 @@ def graficar(path_resultados, estado_sistema):
     plt.figure(figsize=(10, 6))
     plt.bar(meses, promedio_espera_por_tiempo_espera_quirofanos_mensual, color='orange')
     plt.xlabel('Mes de Simulación')
-    plt.ylabel('Pacientes en espera')
+    plt.ylabel('Tiempo de espera (dias)')
     plt.title('Promedio que los pacientes esperan internados')
     plt.xticks(meses)
     plt.grid(axis='y')
     plt.savefig(os.path.join(path_resultados, 'promedio_espera_por_tiempo_espera_quirofanos_mensual.png'), dpi=300)
 
-    for quirofanos in estado_sistema["ocupacion_diaria_quirofanos"]:
-        for k, v in quirofanos.items():
-                ocupacion_total_de_quirofanos[k] += v
+    # for quirofanos in estado_sistema["ocupacion_diaria_quirofanos"]:
+    #     for k, v in quirofanos.items():
+    #             ocupacion_total_de_quirofanos[k] += v
 
-    for k, v in ocupacion_total_de_quirofanos.items():
-        ocupacion_total_de_quirofanos[k] = round((ocupacion_total_de_quirofanos[k] * 100) / (estado_sistema["dias_simulacion"] * 12))
-
-    meses = np.arange(0, len(ocupacion_total_de_quirofanos))
+    # for k, v in ocupacion_total_de_quirofanos.items():
+    #     ocupacion_total_de_quirofanos[k] = round((ocupacion_total_de_quirofanos[k] * 100) / (estado_sistema["dias_simulacion"] * 12))
+    ocupacion_total_de_quirofanos = calcular_porentaje_ocupacion_quirofanos_total(estado_sistema)
+    # meses = np.arange(0, len(ocupacion_total_de_quirofanos))
 
     etiquetas = ['En uso','Ocioso']
     colores=['skyblue','red']
@@ -448,3 +464,21 @@ def graficar(path_resultados, estado_sistema):
 
     plt.savefig(os.path.join(path_resultados, 'grafico_porcentaje_ocupacion_quirofanos.png'), dpi=300)
     plt.tight_layout()
+
+    promedio_de_horas_de_ocupacion_quirofanos_mensual = calcular_promedio_de_horas_de_ocupacion_quirofanos_mensual(estado_sistema)
+    fig, axs = plt.subplots(rows, cols, figsize=(12, 6))
+    fig.subplots_adjust(left=0.8, right=0.9, top=0.9, bottom=0.8)
+    for idx, (k, v) in enumerate(promedio_de_horas_de_ocupacion_quirofanos_mensual.items()):
+            ax = axs[idx // cols, idx % cols]
+
+            datos = promedio_de_horas_de_ocupacion_quirofanos_mensual[k]
+            ax.bar(meses, datos, color='skyblue')
+            print('DEBUG:', k)
+            print('DEBUG:', datos)
+            titulo = str.replace(f'Promedio de horas de ocupacion del {k}','_',' ')
+            ax.set_title(titulo)
+            ax.axis('equal')
+
+    plt.tight_layout()
+
+    plt.savefig(os.path.join(path_resultados, 'grafico_promedio_de_horas_de_ocupacion_quirofanos_mensual.png'), dpi=300)
