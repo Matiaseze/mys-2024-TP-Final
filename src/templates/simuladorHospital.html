@@ -7,11 +7,8 @@
         <meta name="theme-color" content="#712cf9">
         <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/cheatsheet/">
         <link rel="apple-touch-icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
-        <link rel="icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
-        <link rel="icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
         <link rel="manifest" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/manifest.json">
         <link rel="mask-icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
-        <link rel="icon" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/favicon.ico">
 
         <script src="https://getbootstrap.com/docs/5.3/assets/js/color-modes.js"></script>
         <script src="https://getbootstrap.com/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -103,7 +100,7 @@
         <header class="bd-header bg-dark py-3 d-flex align-items-stretch border-bottom border-dark">
             <div class="container-fluid d-flex align-items-center">
                 <h1 class="d-flex align-items-center fs-4 text-white mb-0">
-                    <img src="{{ url_for('static', filename='img/unpsjb.png') }}" class="me-3" alt="Bootstrap">
+                    <img src="{{ url_for('static', filename='img/unpsjb.png') }}" class="me-3" alt="UNPSJB">
                     :: UNPSJB :: Modelos y Simulaci&oacute;n 2024
                 </h1>
             </div>
@@ -138,6 +135,7 @@
                         <ul class="list-unstyled ps-3 collapse" id="trabajoFinal">
                             <li><a href="https://drive.google.com/file/d/1apNT0nQrsuG-muzP3nLug_YYqGMB-v7U/view?usp=sharing" target="blank">Enunciado</a></li>
                             <li><a href="https://docs.google.com/document/d/1_Aq5HP-RTs70vnyPfqQpkYYeDEUURAX4go5qLYh-39s/edit?usp=drive_link" target="blank">Resoluci&oacute;n</a></li>
+                            <li><a href="https://github.com/Matiaseze/mys-2024-TP-Final" target="blank">Repositorio</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -251,14 +249,50 @@
                                                     <ol class="list-group list-group-numbered">
                                                         <li class="list-group-item d-flex justify-content-between align-items-start">
                                                             <div class="ms-2 me-auto">
-                                                                <div class="fw-bold">Tiempo de espera promedio</div>
+                                                                <div class="fw-bold">Tiempo de espera promedio de los pacientes</div>
                                                                 Determinar el tiempo de espera promedio de los pacientes antes de recibir una cama o un quir&oacute;fano.
                                                             </div>
                                                         </li>
                                                         <li class="list-group-item d-flex justify-content-between align-items-start">
                                                             <div class="ms-2 me-auto">
-                                                                <div class="fw-bold">Pacientes en espera</div>
-                                                                Determinar la cantidad de pacientes que esperan antes de ser atendidos.
+                                                                <div class="fw-bold">Pacientes rechazados por camas</div>
+                                                                Determinar la cantidad de pacientes rechazados por ausencia de camas.
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                            <div class="ms-2 me-auto">
+                                                                <div class="fw-bold">Pacientes rechazados por internaci&oacute;n agotada</div>
+                                                                Determinar la cantidad de pacientes rechazados por tiempo de internaci&oacute;n agotado.
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                            <div class="ms-2 me-auto">
+                                                                <div class="fw-bold">Cirug&iacute;as concretadas</div>
+                                                                Determinar la cantidad de cirug&iacute;as concretadas.
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                            <div class="ms-2 me-auto">
+                                                                <div class="fw-bold">Cirug&iacute;as rechazadas</div>
+                                                                Determinar la cantidad de cirug&iacute;as rechazadas.
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                            <div class="ms-2 me-auto">
+                                                                <div class="fw-bold">Cirug&iacute;as reprogramadas por insumos</div>
+                                                                Determinar la cantidad de cirug&iacute;as reprogramadas por insumos.
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                            <div class="ms-2 me-auto">
+                                                                <div class="fw-bold">Cirug&iacute;as reprogramadas por quir&oacute;fanos</div>
+                                                                Determinar la cantidad de cirug&iacute;as reprogramadas por finalizaci&oacute;n del horario de atenc&iacute;on de los quir&oacute;fanos.
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                            <div class="ms-2 me-auto">
+                                                                <div class="fw-bold">Cirug&iacute;as reprogramadas por cuota diaria</div>
+                                                                Determinar la cantidad de cirug&iacute;as reprogramadas por l&iacute;mite de cuota diaria excedido.
                                                             </div>
                                                         </li>
                                                     </ol>
