@@ -7,7 +7,7 @@
 - Ana Enzo
 - Barea Matias
 - Alen Morillo
-- Yrigoyen Carlos
+- Irigoyen Carlos
 
 ### Profesores: Lic. Claudia López de Munain - Lic. Bruno Alfredo Pazos
 
